@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -36,6 +37,8 @@ build/
 =======
 =======
 >>>>>>> cf9fcc2d10135c6e3b476eecc9266da50b81c1bd
+=======
+>>>>>>> 4be451f7f26fb587db691baf3e779f50984d4447
 # Compiled class file
 *.class
 
@@ -60,6 +63,9 @@ build/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> d92ddd6bbc5b43e4423a9b69bd3d43c5be97f130
 =======
 >>>>>>> cf9fcc2d10135c6e3b476eecc9266da50b81c1bd
+=======
+>>>>>>> 4be451f7f26fb587db691baf3e779f50984d4447
