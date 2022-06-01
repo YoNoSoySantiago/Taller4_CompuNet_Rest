@@ -51,12 +51,14 @@ public class SalesTerritoryHistoryDaoImp implements SalesTerritoryHistoryDao{
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salesterritoryhistory> findAll() {
 		String jpql = "Select sth from Salesterritoryhistory sth ";
 		return 	entityManager.createQuery(jpql).getResultList();
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salesterritoryhistory> findByTerritoryid(Integer id) {
 		String jpql = "SELECT st.salesterritoryhistories FROM Salesterritory st " 
 					+ "WHERE st.territoryid="+id;
@@ -64,6 +66,7 @@ public class SalesTerritoryHistoryDaoImp implements SalesTerritoryHistoryDao{
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salesterritoryhistory> findByBusinessentity(Integer id) {
 		String jpql = "SELECT sp.salesterritoryhistories FROM Salesperson sp "
 					+ "WHERE sp.businessentityid="+id;

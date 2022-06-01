@@ -105,8 +105,8 @@ public class SalesPersonServiceImp implements SalesPersonService {
 	}
 	
 	@Override
-	public void delete(Salesperson salesperson) {
-		this.salesPersonDao.delete(salesperson);
+	public void delete(Integer id) {
+		this.salesPersonDao.delete(findById(id).get());
 	}
 
 	@Override

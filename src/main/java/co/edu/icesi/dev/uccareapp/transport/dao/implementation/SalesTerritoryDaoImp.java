@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,12 +51,14 @@ public class SalesTerritoryDaoImp implements SalesTerritoryDao {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salesterritory> findAll() {
 		String jpql = "Select st from Salesterritory st ";
 		return 	entityManager.createQuery(jpql).getResultList();
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salesterritory> specialQuery(){
 		String jpql = "SELECT st FROM Salesterritory st "
 					+ "WHERE (SELECT COUNT(sp) FROM Salesperson sp WHERE sp MEMBER OF st.salespersons "

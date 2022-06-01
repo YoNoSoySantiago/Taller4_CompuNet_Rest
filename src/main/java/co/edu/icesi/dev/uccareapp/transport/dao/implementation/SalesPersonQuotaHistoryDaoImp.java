@@ -52,12 +52,14 @@ public class SalesPersonQuotaHistoryDaoImp implements SalesPersonQuotaHistoryDao
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salespersonquotahistory> findAll() {
 		String jpql = "Select spqh from Salespersonquotahistory spqh ";
 		return 	entityManager.createQuery(jpql).getResultList();
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salespersonquotahistory> findByBusinessentityid(Integer id) {
 		String jpql = "SELECT sp.salespersonquotahistories FROM Salesperson sp "
 					+ "WHERE sp.businessentityid="+id;
@@ -65,6 +67,7 @@ public class SalesPersonQuotaHistoryDaoImp implements SalesPersonQuotaHistoryDao
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salespersonquotahistory> findBySalesquota(BigDecimal salesquota) {
 		String jpql = "SELECT spqh FROM Salespersonquotahistory spqh "
 					+ "WHERE spqh.salesquota="+salesquota;

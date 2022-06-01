@@ -36,6 +36,7 @@ public class CountryRegionDaoImp implements CountryRegionDao {
 		return Optional.of(entity);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Iterable<Countryregion> findAll() {
 		String jpql = "Select cr from Countryregion cr";

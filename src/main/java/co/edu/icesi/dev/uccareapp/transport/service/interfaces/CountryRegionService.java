@@ -2,7 +2,6 @@ package co.edu.icesi.dev.uccareapp.transport.service.interfaces;
 
 import java.util.Optional;
 
-import org.springframework.stereotype.Service;
 
 import co.edu.icesi.dev.uccareapp.transport.model.person.Countryregion;
 public interface CountryRegionService {

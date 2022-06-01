@@ -24,13 +24,8 @@ private UserRepository ur;
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		UserApp userApp = ur.findByUsername(username).get();
 		System.out.println(userApp.getUsername());
-		if (userApp != null) {
-			
-			User.UserBuilder builder = User.withUsername(username).password(userApp.getPassword()).roles(userApp.getType().toString());
-			return builder.build();
-		} else {
-			throw new UsernameNotFoundException("User not found.");
-		}
+		User.UserBuilder builder = User.withUsername(username).password(userApp.getPassword()).roles(userApp.getType().toString());
+		return builder.build();
 	}
 
 }

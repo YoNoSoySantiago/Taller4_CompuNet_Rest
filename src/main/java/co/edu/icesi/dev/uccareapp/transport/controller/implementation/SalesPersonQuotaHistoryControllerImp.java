@@ -2,8 +2,6 @@ package co.edu.icesi.dev.uccareapp.transport.controller.implementation;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,28 +13,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectAlreadyExistException;
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectDoesNotExistException;
+import co.edu.icesi.dev.uccareapp.transport.business.delegate.interfaces.SalesPersonQuotaHistoryBusinessDelegate;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salespersonquotahistory;
-import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesterritoryhistory;
 import co.edu.icesi.dev.uccareapp.transport.repository.SalesPersonRepository;
-import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesPersonQuotaHistoryService;
 
 @Controller
 public class SalesPersonQuotaHistoryControllerImp {
 	
-	SalesPersonQuotaHistoryService salesPersonQuotaHistoryService;
+	SalesPersonQuotaHistoryBusinessDelegate salesPersonQuotaHistoryBusinesDelegate;
 	SalesPersonRepository salesPersonRepository;
 	
-	public SalesPersonQuotaHistoryControllerImp(SalesPersonQuotaHistoryService spqhs, SalesPersonRepository spr) {
-		this.salesPersonQuotaHistoryService = spqhs;
+	public SalesPersonQuotaHistoryControllerImp(SalesPersonQuotaHistoryBusinessDelegate spqhs, SalesPersonRepository spr) {
+		this.salesPersonQuotaHistoryBusinesDelegate = spqhs;
 		this.salesPersonRepository = spr;
 	}
 	
 	@GetMapping("/sales_persons_history")
 	public String salesTerritories(Model model) {
-		model.addAttribute("persons_history", salesPersonQuotaHistoryService.findAll());
+		model.addAttribute("persons_history", salesPersonQuotaHistoryBusinesDelegate.findAll());
 		return "history/person/index";
 	}
 	
@@ -59,8 +53,8 @@ public class SalesPersonQuotaHistoryControllerImp {
 					}
 					
 					salespersonquotahistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
-					salesPersonQuotaHistoryService.add(salespersonquotahistory, salespersonquotahistory.getSalesperson().getBusinessentityid());
-				} catch (InvalidValueException | ObjectDoesNotExistException | ObjectAlreadyExistException e) {
+					salesPersonQuotaHistoryBusinesDelegate.add(salespersonquotahistory);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -69,9 +63,9 @@ public class SalesPersonQuotaHistoryControllerImp {
 	
 	@GetMapping("/sales_persons_history/edit/{id}")
 	public String editSalesTerritory(@PathVariable("id") int id,Model model) {
-		Optional<Salespersonquotahistory> person_history = salesPersonQuotaHistoryService.findById(id);
-		if(!person_history.isEmpty()) {
-			model.addAttribute("salespersonquotahistory", person_history.get());
+		Salespersonquotahistory person_history = salesPersonQuotaHistoryBusinesDelegate.findById(id);
+		if(person_history!=null) {
+			model.addAttribute("salespersonquotahistory", person_history);
 			model.addAttribute("sales_persons", salesPersonRepository.findAll());
 			return "history/person/update-sales-person-quota-history";
 		}
@@ -91,21 +85,21 @@ public class SalesPersonQuotaHistoryControllerImp {
 			}
 			try {
 				salespersonhistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
-				salesPersonQuotaHistoryService.edit(salespersonhistory);
-			} catch (InvalidValueException | ObjectDoesNotExistException e) {
+				salesPersonQuotaHistoryBusinesDelegate.update(salespersonhistory);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			model.addAttribute("persons_history", salesPersonQuotaHistoryService.findAll());
+			model.addAttribute("persons_history", salesPersonQuotaHistoryBusinesDelegate.findAll());
 		}
 		return "redirect:/sales_persons_history";
 	}
 	
 	@GetMapping("/sales_persons_history/del/{id}")
 	public String deleteUser(@PathVariable("id") int id, Model model) {
-		Optional<Salespersonquotahistory> person_history = salesPersonQuotaHistoryService.findById(id);
-		if(!person_history.isEmpty()) {
-			salesPersonQuotaHistoryService.delete(person_history.get());
-			model.addAttribute("persons_history", salesPersonQuotaHistoryService.findAll());
+		Salespersonquotahistory person_history = salesPersonQuotaHistoryBusinesDelegate.findById(id);
+		if(person_history!=null) {
+			salesPersonQuotaHistoryBusinesDelegate.delete(person_history.getId());
+			model.addAttribute("persons_history", salesPersonQuotaHistoryBusinesDelegate.findAll());
 		}
 		return "redirect:/sales_persons_history";
 	}

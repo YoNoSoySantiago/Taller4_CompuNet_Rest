@@ -3,7 +3,6 @@ package co.edu.icesi.dev.uccareapp.transport.tests;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -13,7 +12,6 @@ import java.time.LocalDateTime;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.hibernate.HibernateException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -203,8 +201,7 @@ public class Taller3ShAplicationDaoIntegrationTest {
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public void SalesTerritoryHistoryDaoUpdate() {
 		Salesterritoryhistory sth = salesTerritoryHistoryDao.findById(1).get();
-		Salesperson sp = sth.getSalesPerson();
-		Salesterritory st = sth.getSalesTerritory();
+		
 		
 		sth.setSalesPerson(salesPersonDao.findById(n_sp).get());
 		sth.setSalesTerritory(salesTerritoryDao.findById(n_st).get());

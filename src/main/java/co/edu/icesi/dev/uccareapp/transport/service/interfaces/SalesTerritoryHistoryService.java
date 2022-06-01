@@ -16,5 +16,5 @@ public interface SalesTerritoryHistoryService {
 	public Iterable<Salesterritoryhistory> findAll();
 	
 	public void clear();
-	public void delete(Salesterritoryhistory salesterritoryhistory);
+	public void delete(Integer salesterritoryhistory);
 }

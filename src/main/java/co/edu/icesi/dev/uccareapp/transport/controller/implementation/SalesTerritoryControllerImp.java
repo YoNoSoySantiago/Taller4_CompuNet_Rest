@@ -1,7 +1,7 @@
 package co.edu.icesi.dev.uccareapp.transport.controller.implementation;
 
-import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,26 +12,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectDoesNotExistException;
+import co.edu.icesi.dev.uccareapp.transport.business.delegate.interfaces.SalesTerritoryBusinessDelegate;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesterritory;
 import co.edu.icesi.dev.uccareapp.transport.repository.CountryRegionRepository;
-import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesTerritoryService;
 
 @Controller
 public class SalesTerritoryControllerImp {
 	
-	private SalesTerritoryService salesTerritoryService;
+	private SalesTerritoryBusinessDelegate salesTerritoryBusinessDelegate;
 	private CountryRegionRepository countryRegionRepository;
 	
-	public SalesTerritoryControllerImp(SalesTerritoryService sts,CountryRegionRepository crr) {
-		this.salesTerritoryService = sts;
+	@Autowired
+	public SalesTerritoryControllerImp(SalesTerritoryBusinessDelegate sts,CountryRegionRepository crr) {
+		this.salesTerritoryBusinessDelegate = sts;
 		this.countryRegionRepository = crr;
 	}
 	
 	@GetMapping("/sales_territories")
 	public String salesTerritories(Model model) {
-		model.addAttribute("territories", salesTerritoryService.findAll());
+		model.addAttribute("territories", salesTerritoryBusinessDelegate.findAll());
 		return "sales/territory/index";
 	}
 	
@@ -53,8 +52,8 @@ public class SalesTerritoryControllerImp {
 					System.out.println(bindingResult.getFieldError().getObjectName()+" ERROR");
 					return "sales/territory/add-sales-territory";
 				}
-				salesTerritoryService.add(salesTerritory);
-			} catch (InvalidValueException | ObjectDoesNotExistException e) {
+				salesTerritoryBusinessDelegate.add(salesTerritory);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -63,9 +62,9 @@ public class SalesTerritoryControllerImp {
 	
 	@GetMapping("/sales_territories/edit/{id}")
 	public String editSalesTerritory(@PathVariable("id") int id,Model model) {
-		Optional<Salesterritory> territory = salesTerritoryService.findById(id);
-		if(!territory.isEmpty()) {
-			model.addAttribute("salesterritory", territory.get());
+		Salesterritory territory = salesTerritoryBusinessDelegate.findById(id);
+		if(territory!=null) {
+			model.addAttribute("salesterritory", territory);
 			model.addAttribute("countries_region", countryRegionRepository.findAll());
 			return "sales/territory/update-sales-territory";
 		}
@@ -83,30 +82,30 @@ public class SalesTerritoryControllerImp {
 				return "sales/territory/update-sales-territory";
 			}
 			try {
-				salesTerritoryService.edit(salesterritory);
-			} catch (InvalidValueException | ObjectDoesNotExistException e) {
+				salesTerritoryBusinessDelegate.update(salesterritory);
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			model.addAttribute("territories", salesTerritoryService.findAll());
+			model.addAttribute("territories", salesTerritoryBusinessDelegate.findAll());
 		}
 		return "redirect:/sales_territories";
 	}
 	
 	@GetMapping("/sales_territories/del/{id}")
 	public String deleteUser(@PathVariable("id") int id, Model model) {
-		Optional<Salesterritory> territory = salesTerritoryService.findById(id);
-		if(!territory.isEmpty()) {
+		Salesterritory territory = salesTerritoryBusinessDelegate.findById(id);
+		if(territory!=null) {
 
-			salesTerritoryService.delete(territory.get());
-			model.addAttribute("territories", salesTerritoryService.findAll());
+			salesTerritoryBusinessDelegate.delete(territory.getTerritoryid());
+			model.addAttribute("territories", salesTerritoryBusinessDelegate.findAll());
 		}
 		return "redirect:/sales_territories";
 	}
 	
 	@GetMapping("/sales_territories/sales_person_list/{id}")
 	public String showSalesPersonList(@PathVariable("id") int id,Model model) {
-		Salesterritory st = salesTerritoryService.findById(id).get();
+		Salesterritory st = salesTerritoryBusinessDelegate.findById(id);
 		if(st!=null) {
 			model.addAttribute("sales_persons", st.getSalespersons());
 		}
@@ -116,7 +115,7 @@ public class SalesTerritoryControllerImp {
 	
 	@GetMapping("/sales_territories/sales_territory_history_list/{id}")
 	public String showSalesTerritoryHistoryList(@PathVariable("id") int id,Model model) {
-		Salesterritory st = salesTerritoryService.findById(id).get();
+		Salesterritory st = salesTerritoryBusinessDelegate.findById(id);
 		if(st!=null) {
 			model.addAttribute("territories_history", st.getSalesterritoryhistories());
 		}

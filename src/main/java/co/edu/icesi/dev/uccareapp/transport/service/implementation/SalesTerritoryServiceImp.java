@@ -72,8 +72,8 @@ public class SalesTerritoryServiceImp implements SalesTerritoryService {
 	}
 	
 	@Override
-	public void delete(Salesterritory salesTerritory) {
-		this.salesTerritoryDao.delete(salesTerritory);
+	public void delete(Integer id) {
+		this.salesTerritoryDao.delete(findById(id).get());
 	}
 
 	@Override

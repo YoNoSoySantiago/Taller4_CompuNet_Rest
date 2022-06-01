@@ -108,8 +108,8 @@ public class SalesTerritoryHistoryServiceImp implements SalesTerritoryHistorySer
 	}
 
 	@Override
-	public void delete(Salesterritoryhistory salesterritoryhistory) {
-		this.salesTerritoryHistoryDao.delete(salesterritoryhistory);
+	public void delete(Integer id) {
+		this.salesTerritoryHistoryDao.delete(findById(id).get());
 	}
 
 

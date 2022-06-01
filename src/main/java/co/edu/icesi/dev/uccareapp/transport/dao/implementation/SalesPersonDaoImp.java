@@ -70,6 +70,7 @@ public class SalesPersonDaoImp implements SalesPersonDao {
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Salesperson> findByTerritoryId(Integer id) {
 		String jpql = "SELECT st.salespersons FROM Salesterritory st "
 					+ "WHERE st.territoryid="+id;

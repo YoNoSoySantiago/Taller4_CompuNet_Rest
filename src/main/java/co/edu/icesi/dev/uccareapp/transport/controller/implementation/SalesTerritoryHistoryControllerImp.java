@@ -3,7 +3,6 @@ package co.edu.icesi.dev.uccareapp.transport.controller.implementation;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,31 +15,27 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectAlreadyExistException;
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectDoesNotExistException;
-import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesterritory;
+import co.edu.icesi.dev.uccareapp.transport.business.delegate.interfaces.SalesTerritoryHistoryBusinessDelegate;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesterritoryhistory;
 import co.edu.icesi.dev.uccareapp.transport.repository.SalesPersonRepository;
 import co.edu.icesi.dev.uccareapp.transport.repository.SalesTerritoryRepository;
-import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesTerritoryHistoryService;
 
 @Controller
 public class SalesTerritoryHistoryControllerImp {
 	
-	private SalesTerritoryHistoryService salesTerritoryHistoryService;
+	private SalesTerritoryHistoryBusinessDelegate salesTerritoryHistoryBusinessDelegate;
 	private SalesPersonRepository salesPersonRepository;
 	private SalesTerritoryRepository salesTerritoryRepository;
 	
-	public SalesTerritoryHistoryControllerImp(SalesTerritoryHistoryService sths, SalesPersonRepository spr, SalesTerritoryRepository str) {
-		this.salesTerritoryHistoryService = sths;
+	public SalesTerritoryHistoryControllerImp(SalesTerritoryHistoryBusinessDelegate sths, SalesPersonRepository spr, SalesTerritoryRepository str) {
+		this.salesTerritoryHistoryBusinessDelegate = sths;
 		this.salesPersonRepository = spr;
 		this.salesTerritoryRepository = str;
 	}
 	
 	@GetMapping("/sales_territories_history")
 	public String salesTerritories(Model model) {
-		model.addAttribute("territories_history", salesTerritoryHistoryService.findAll());
+		model.addAttribute("territories_history", salesTerritoryHistoryBusinessDelegate.findAll());
 		return "history/territory/index";
 	}
 	
@@ -98,10 +93,8 @@ public class SalesTerritoryHistoryControllerImp {
 				}
 				
 				salesTerritoryHistory.setModifieddate(Timestamp.valueOf(LocalDateTime.now()));
-				salesTerritoryHistoryService.add(salesTerritoryHistory,
-						salesTerritoryHistory.getSalesPerson().getBusinessentityid(),
-						salesTerritoryHistory.getSalesTerritory().getTerritoryid());
-			} catch (InvalidValueException | ObjectDoesNotExistException | ObjectAlreadyExistException e) {
+				salesTerritoryHistoryBusinessDelegate.add(salesTerritoryHistory);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -110,9 +103,9 @@ public class SalesTerritoryHistoryControllerImp {
 	
 	@GetMapping("/sales_territories_history/edit/{id}")
 	public String editSalesTerritory(@PathVariable("id") int id,Model model) {
-		Optional<Salesterritoryhistory> territory_history = salesTerritoryHistoryService.findById(id);
-		if(!territory_history.isEmpty()) {
-			model.addAttribute("salesterritoryhistory", territory_history.get());
+		Salesterritoryhistory territory_history = salesTerritoryHistoryBusinessDelegate.findById(id);
+		if(territory_history!=null) {
+			model.addAttribute("salesterritoryhistory", territory_history);
 			model.addAttribute("sales_persons", salesPersonRepository.findAll());
 			model.addAttribute("sales_territories", salesTerritoryRepository.findAll());
 			return "history/territory/update-sales-territory-history";
@@ -143,21 +136,21 @@ public class SalesTerritoryHistoryControllerImp {
 			}
 			try {
 				salesterritoryhistory.setId(id);
-				salesTerritoryHistoryService.edit(salesterritoryhistory);
-			} catch (InvalidValueException | ObjectDoesNotExistException e) {
+				salesTerritoryHistoryBusinessDelegate.update(salesterritoryhistory);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			model.addAttribute("territories_history", salesTerritoryHistoryService.findAll());
+			model.addAttribute("territories_history", salesTerritoryHistoryBusinessDelegate.findAll());
 		}
 		return "redirect:/sales_territories_history";
 	}
 	
 	@GetMapping("/sales_territories_history/del/{id}")
 	public String deleteUser(@PathVariable("id") int id, Model model) {
-		Optional<Salesterritoryhistory> territory_history = salesTerritoryHistoryService.findById(id);
-		if(!territory_history.isEmpty()) {
-			salesTerritoryHistoryService.delete(territory_history.get());
-			model.addAttribute("territories_history", salesTerritoryHistoryService.findAll());
+		Salesterritoryhistory territory_history = salesTerritoryHistoryBusinessDelegate.findById(id);
+		if(territory_history!=null) {
+			salesTerritoryHistoryBusinessDelegate.delete(territory_history.getId());
+			model.addAttribute("territories_history", salesTerritoryHistoryBusinessDelegate.findAll());
 		}
 		return "redirect:/sales_territories_history";
 	}
@@ -165,14 +158,14 @@ public class SalesTerritoryHistoryControllerImp {
 	@GetMapping("/sales_territories_history/sales_person_info/{id}")
 	public String showSalesPersonInfo(@PathVariable("id") int id, Model model) {
 		model.addAttribute("back", "/sales_territories_history");
-		model.addAttribute("salesperson", salesPersonRepository.findById(id).get());
+		model.addAttribute("salesperson", salesPersonRepository.findById(id));
 		return "sales/person/info-sales-person";
 	}
 	
 	@GetMapping("/sales_territories_history/sales_territory_info/{id}")
 	public String showSalesTerritoryInfo(@PathVariable("id") int id, Model model) {
 		model.addAttribute("back", "/sales_territories_history");
-		model.addAttribute("salesterritory", salesTerritoryRepository.findById(id).get());
+		model.addAttribute("salesterritory", salesTerritoryRepository.findById(id));
 		return "sales/territory/info-sales-territory";
 	}
 }

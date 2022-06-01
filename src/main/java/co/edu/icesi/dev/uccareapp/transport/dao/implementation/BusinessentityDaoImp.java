@@ -36,6 +36,7 @@ public class BusinessentityDaoImp implements BusinessentityDao {
 		return Optional.of(entity);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Iterable<Businessentity> findAll() {
 		String jpql = "Select be from Businessentity be";

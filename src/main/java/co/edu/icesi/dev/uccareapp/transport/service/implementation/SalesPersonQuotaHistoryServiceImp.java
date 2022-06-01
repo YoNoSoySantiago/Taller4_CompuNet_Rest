@@ -94,8 +94,8 @@ public class SalesPersonQuotaHistoryServiceImp implements SalesPersonQuotaHistor
 	}
 
 	@Override
-	public void delete(Salespersonquotahistory salespersonquotahistory) {
-		this.salesPersonQuotaHistoryDao.delete(salespersonquotahistory);
+	public void delete(Integer id) {
+		this.salesPersonQuotaHistoryDao.delete(findById(id).get());
 	}
 
 }

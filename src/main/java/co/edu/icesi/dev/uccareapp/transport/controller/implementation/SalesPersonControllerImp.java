@@ -2,7 +2,6 @@ package co.edu.icesi.dev.uccareapp.transport.controller.implementation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,27 +14,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.InvalidValueException;
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectAlreadyExistException;
-import co.edu.icesi.dev.uccareapp.transport.customexeptions.ObjectDoesNotExistException;
+import co.edu.icesi.dev.uccareapp.transport.business.delegate.interfaces.SalesPersonBusinessDelegate;
 import co.edu.icesi.dev.uccareapp.transport.model.person.Businessentity;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesperson;
 import co.edu.icesi.dev.uccareapp.transport.model.sales.Salesterritory;
 import co.edu.icesi.dev.uccareapp.transport.repository.BusinessentityRepository;
 import co.edu.icesi.dev.uccareapp.transport.repository.SalesTerritoryRepository;
-import co.edu.icesi.dev.uccareapp.transport.service.implementation.SalesPersonServiceImp;
-import co.edu.icesi.dev.uccareapp.transport.service.interfaces.SalesPersonService;
 
 @Controller
 public class SalesPersonControllerImp {
 	
-	private SalesPersonService salesPersonService;
+	private SalesPersonBusinessDelegate salesPersonBusinessDelegate;
 	private BusinessentityRepository businessentityRepository;
 	private SalesTerritoryRepository salesTerritoryRepository;
 	
 	@Autowired
-	public SalesPersonControllerImp(SalesPersonServiceImp sps,BusinessentityRepository br,SalesTerritoryRepository str) {
-		this.salesPersonService = sps;
+	public SalesPersonControllerImp(SalesPersonBusinessDelegate salesPersonBusinessDelegate,BusinessentityRepository br,SalesTerritoryRepository str) {
+		this.salesPersonBusinessDelegate = salesPersonBusinessDelegate;
 		this.businessentityRepository = br;
 		this.salesTerritoryRepository = str;
 	}
@@ -52,7 +47,7 @@ public class SalesPersonControllerImp {
 	
 	@GetMapping("/sales_persons")
 	public String salesPersons(Model model) {
-		model.addAttribute("sales_persons", salesPersonService.findAll());
+		model.addAttribute("sales_persons", salesPersonBusinessDelegate.findAll());
 		return "sales/person/index";
 	}
 	
@@ -102,9 +97,9 @@ public class SalesPersonControllerImp {
 					model.addAttribute("salesperson", salesperson);
 					return "sales/person/add-sales-person";
 				}
-				salesPersonService.add(salesperson,  salesperson.getBusinessentityid(),salesperson.getSalesterritory().getTerritoryid());
+				salesPersonBusinessDelegate.add(salesperson);
 				
-			} catch (InvalidValueException | ObjectAlreadyExistException | ObjectDoesNotExistException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -114,13 +109,13 @@ public class SalesPersonControllerImp {
 	
 	@GetMapping("/sales_persons/edit/{id}")
 	public String editSalesPerson(@PathVariable("id") int id,Model model) {
-		Optional<Salesperson> salesPerson = salesPersonService.findById(id);
-		if(!salesPerson.isEmpty()) {
+		Salesperson salesPerson = salesPersonBusinessDelegate.findById(id);
+		if(salesPerson!=null) {
 			
 			Iterable<Salesterritory> territories = salesTerritoryRepository.findAll();
 			
 			model.addAttribute("territories", territories.iterator());
-			model.addAttribute("salesperson", salesPerson.get());
+			model.addAttribute("salesperson", salesPerson);
 			return "sales/person/update-sales-person";
 		}
 		return "redirect:/sales_persons";
@@ -140,22 +135,22 @@ public class SalesPersonControllerImp {
 			}
 			try {
 				salesperson.setBusinessentityid(id);
-				salesPersonService.edit(salesperson);
-			} catch (InvalidValueException | ObjectDoesNotExistException e) {
+				salesPersonBusinessDelegate.update(salesperson);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			model.addAttribute("sales_persons", salesPersonService.findAll());
+			model.addAttribute("sales_persons", salesPersonBusinessDelegate.findAll());
 		}
 		return "redirect:/sales_persons";
 	}
 	
 	@GetMapping("/sales_persons/del/{id}")
 	public String deleteSalesPerson(@PathVariable("id") int id, Model model) {
-		Optional<Salesperson> salesPerson = salesPersonService.findById(id);
-		if(!salesPerson.isEmpty()) {
+		Salesperson salesPerson = salesPersonBusinessDelegate.findById(id);
+		if(salesPerson!=null) {
 			
-			salesPersonService.delete(salesPerson.get());
-			model.addAttribute("sales_persons", salesPersonService.findAll());
+			salesPersonBusinessDelegate.delete(salesPerson.getBusinessentityid());
+			model.addAttribute("sales_persons", salesPersonBusinessDelegate.findAll());
 		}
 		return "redirect:/sales_persons";
 	}
@@ -170,7 +165,7 @@ public class SalesPersonControllerImp {
 	@GetMapping("/sales_persons/sales_person_quota_history_list/{id}")
 	public String showSalesPersonHistory(@PathVariable("id") int id, Model model) {
 		model.addAttribute("back", "/sales_persons");
-		Salesperson sp = salesPersonService.findById(id).get();
+		Salesperson sp = salesPersonBusinessDelegate.findById(id);
 		model.addAttribute("persons_history", sp.getSalespersonquotahistories());
 		return "history/person/list-sales-person-quota-history";
 	}
@@ -178,7 +173,7 @@ public class SalesPersonControllerImp {
 	@GetMapping("/sales_persons/sales_territory_history_list/{id}")
 	public String showSalesTerritoryHistory(@PathVariable("id") int id, Model model) {
 		model.addAttribute("back", "/sales_persons");
-		Salesperson sp = salesPersonService.findById(id).get();
+		Salesperson sp = salesPersonBusinessDelegate.findById(id);
 		model.addAttribute("territories_history", sp.getSalesterritoryhistories());
 		return "history/territory/list-sales-territory-history";
 	}
